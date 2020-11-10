@@ -3,7 +3,7 @@
 '''
 
 def topo_sort(n: int, m: int, graph: list) -> list:
-    sorted_list = [0]*n
+    sorted_list = list()
     queue = list()
 
     in_degree = dict()
@@ -31,7 +31,7 @@ def topo_sort(n: int, m: int, graph: list) -> list:
     index = 0
     while queue:
         item = queue.pop(0)
-        sorted_list[index] = item
+        sorted_list.append(item)
         index += 1
 
         for key, values in adjacency.items():
@@ -50,6 +50,14 @@ def topo_sort(n: int, m: int, graph: list) -> list:
 
 # Write your code here
 if __name__ == "__main__":
+    adj1 = [[5,0],[5,2],[2,3],[4,0],[4,1],[1,3]]
+    num, edges = 6,6
+    print(topo_sort(n=num, m=edges, graph=adj1))
+
+    num, edges = 4, 3
+    adj2 = [[3,0], [1,0], [2,0]]
+    print(topo_sort(n=num, m=edges, graph=adj2))
+
     n, m = 5, 6
     graph = [[1,2],[1,3],[2,3],[2,4],[3,4],[3,5]]
     print(topo_sort(n=n, m=m, graph=graph))
