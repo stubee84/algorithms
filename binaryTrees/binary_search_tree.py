@@ -4,36 +4,49 @@ class BST:
         self.left_node = None
         self.right_node = None
         self.root: int = number
-        self.depth: int = 0
+        self.left_depth: int = 0
+        self.right_depth: int = 0
         self.left_count: int = 0
         self.right_count: int = 0
-        self.total_count: int = 1
 
     def insert(self, num: int) -> tuple:
         if num < self.root:
             #in a balanced tree the left depth will always be greater than or equal to the right
             if self.left_node is not None:
-                depthAndCount = self.left_node.insert(num=num)
-                self.depth += depthAndCount[0]
-                self.left_count += depthAndCount[1]
-                self.total_count += self.left_count
-                self.balance_left()
+                if self.right_node is None:
+                    self.right_node = BST(number=self.root)
+                    self.root = self.left_node.root
+                    self.left_node.root = num
+                    self.right_count += 1
+                    self.right_depth += 1
+                    returnDepth = 0
+                else:
+                    depthAndCount = self.left_node.insert(num=num)
+                    self.left_depth += depthAndCount[0]
+                    self.left_count += depthAndCount[1]
             else:
                 self.left_node = BST(number=num)
-                self.depth += 1
+                self.left_depth += 1
                 self.left_count += 1
-                self.total_count += 1
+                returnDepth = 1
         elif num > self.root:
-            if self.right_node is not None:
+            if self.left_node is None:
+                self.left_node = BST(number=self.root)
+                self.root = num
+                self.left_count += 1
+                self.left_depth += 1
+                returnDepth = 1
+            elif self.right_node is not None:
                 depthAndCount = self.right_node.insert(num=num)
+                self.right_depth += depthAndCount[0]
                 self.right_count += depthAndCount[1]
-                self.total_count += self.right_count
             else:
                 self.right_node = BST(number=num)
-                self.total_count += 1
+                self.right_depth += 1
                 self.right_count += 1
+                returnDepth = 1
 
-        return self.depth, self.total_count
+        return 1 if 'returnDepth' not in locals() else returnDepth, self.left_count if self.left_count > self.right_count else self.right_count
 
     def remove(self, num: int):
         if num < self.root:
@@ -56,14 +69,12 @@ class BST:
             #balance the sub_tree
             self.balance_left()
         else:
-            self.total_count -= 1
             self.left_count -= 1
 
             if self.left_node is not None:
                 value = self.root
                 self.root = self.left_node.root
                 self.left_node = None
-                self.depth -= 1
             else:
                 value = self.root
                 self = None
@@ -74,7 +85,6 @@ class BST:
             value = self.left_node.get_least_right()
             self.balance_right()
         else:
-            self.total_count -= 1
             self.right_count -= 1
 
             value = self.root
@@ -91,6 +101,17 @@ class BST:
             self.left_node.search(num=num)
         else:
             return None
+        
+    def balance(self):
+        if self.left_depth > self.right_depth+1:
+            next_root = self.left_node.get_greatest_left()
+        elif self.right_depth > self.left_depth:
+            next_root = self.right_node.get_least_right()
+        else:
+            return
+        old_root = self.root
+        self.root = next_root
+        self.insert(num=old_root)
 
     def balance_left(self):
         if self.left_node.left_node is not None:
@@ -125,8 +146,12 @@ def build_tree(numbers: list) -> BST:
     for i, num in enumerate(numbers):
         if i == 0:
             tree = BST(number=num)
+            continue
         tree.insert(num=num)
 
+    # tree.total_count += tree.left_count + tree.right_count
+    # tree.depth = tree.left_depth if tree.left_depth > tree.right_depth else tree.right_depth
+    tree.balance()
     return tree
 
 if __name__ == "__main__":
