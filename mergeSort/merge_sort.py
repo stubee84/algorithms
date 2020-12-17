@@ -1,3 +1,12 @@
+'''
+    Constructor accepts two variables. And calls the sort method.
+        Num = the number of strings to sort
+        strings = the list of strings to sort
+
+    The sort function sorts every strings based on the length of the set and sorts by length.
+    If two sets are equal in length then the sort function maintains order of entry.
+'''
+
 from typing import List
 
 class merge_sort:
